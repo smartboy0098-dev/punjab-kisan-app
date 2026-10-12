@@ -1,0 +1,36 @@
+name: Punjab Kisan App Instant Cloud Builder
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📁 Fetching Live App Sources
+        uses: actions/checkout@v4
+
+      - name: ☕ Setting Up Secure Java environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🚀 Initializing Modern Flutter toolchain Engine
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: 📦 Downloading Dependencies & Packages
+        run: flutter pub get
+
+      - name: 🔨 Building Android Release Installer APK
+        run: flutter build apk --release --no-shrink
+
+      - name: 📥 Generating Direct Phone Download Link Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Punjab-Kisan-App-Release
+          path: build/app/outputs/flutter-apk/app-release.apk
