@@ -9,106 +9,216 @@ class OnlineShopScreen extends StatefulWidget {
 }
 
 class _OnlineShopScreenState extends State<OnlineShopScreen> {
-  final List<Map<String, String>> _appliances = [
-    {
-      'name': 'Samsung 32 inch LED TV',
-      'price': '₹7,500',
-      'details': 'Condition: 9/10 | 2 Years Used',
-    },
-    {
-      'name': 'Godrej Double Door Refrigerator',
-      'price': '₹11,200',
-      'details': 'Model: 2022 | 240 Liters',
-    },
-  ];
   final List<Map<String, String>> _shopLiveAds = [
     {
       'brand': 'Swaraj Tractors',
-      'msg': '🚜 Naya Swaraj 855 FE: 5-Saal Warranty ke sath aaj hi booking karein!',
+      'msg':
+          '🚜 Swaraj 744 FE: Har kisan ki pehli pasand, aaj hi booking karein!',
+    },
+    {
+      'brand': 'Bayer Crop',
+      'msg': '🌱 Nativo Fungicide: Fasal ki suraksha day-one se lock!',
     },
   ];
-  int _topAdIndex = 0;
-  Timer? _shopAdTimer;
-  final _nameCtrl = TextEditingController(),
-      _priceCtrl = TextEditingController(),
-      _detCtrl = TextEditingController();
+  int _topAdIndex = 0, _bottomAdIndex = 1;
+  Timer? _adTimer;
 
   @override
   void initState() {
     super.initState();
-    _shopAdTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (mounted)
+    _adTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
         setState(() {
           _topAdIndex = (_topAdIndex + 1) % _shopLiveAds.length;
+          _bottomAdIndex = (_bottomAdIndex + 1) % _shopLiveAds.length;
         });
+      }
     });
   }
 
   @override
   void dispose() {
-    _shopAdTimer?.cancel();
-    _nameCtrl.dispose();
-    _priceCtrl.dispose();
-    _detCtrl.dispose();
+    _adTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Online Ghar Store'),
-          backgroundColor: Colors.teal,
-          foregroundColor: Colors.white,
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Buy'),
-              Tab(text: 'Sell'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _appliances.length,
-              itemBuilder: (c, i) => Card(
-                child: ListTile(
-                  title: Text(_appliances[i]['name']!),
-                  subtitle: Text(_appliances[i]['details']!),
-                  trailing: Text(
-                    _appliances[i]['price']!,
-                    style: const TextStyle(
-                      color: Colors.teal,
-                      fontWeight: FontWeight.bold,
-                    ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFE0F2F1),
+      appBar: AppBar(
+        title: const Text('Online Ghar Store / ਘਰ ਸਟੋਰ'),
+        backgroundColor: Colors.teal.shade700,
+        foregroundColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          // 💰 Top Ad Banner
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            color: const Color(0xFF1E1E1E),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  backgroundColor: Colors.teal,
+                  radius: 14,
+                  child: Icon(Icons.star, color: Colors.white, size: 14),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _shopLiveAds[_topAdIndex]['brand']!.toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.teal,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                      Text(
+                        _shopLiveAds[_topAdIndex]['msg']!,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                const Text(
+                  'Ad',
+                  style: TextStyle(color: Colors.grey, fontSize: 10),
+                ),
+              ],
             ),
-            SingleChildScrollView(
+          ),
+          Expanded(
+            child: GridView.count(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _nameCtrl,
-                    decoration: const InputDecoration(labelText: 'Item Name'),
-                  ),
-                  TextField(
-                    controller: _priceCtrl,
-                    decoration: const InputDecoration(labelText: 'Price'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Post Ad'),
-                  ),
-                ],
-              ),
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.9,
+              children: [
+                _shopCard(
+                  'Samsung 32" LED TV',
+                  '₹7,500',
+                  'Used 2 yrs | Condition 9/10',
+                  Icons.tv,
+                ),
+                _shopCard(
+                  'Godrej Refrigerator',
+                  '₹11,200',
+                  'Double Door | 240 Liters',
+                  Icons.kitchen,
+                ),
+                _shopCard(
+                  'Bajaj Mixer Grinder',
+                  '₹1,800',
+                  'Brand New | 3 Jars Box',
+                  Icons.blender,
+                ),
+                _shopCard(
+                  'Orient Ceiling Fan',
+                  '₹1,200',
+                  'High Speed | 1 yr warranty',
+                  Icons.wind_power,
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          // 💰 Bottom Ad Banner
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            color: const Color(0xFF1E1E1E),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  backgroundColor: Colors.teal,
+                  radius: 14,
+                  child: Icon(Icons.star, color: Colors.white, size: 14),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _shopLiveAds[_bottomAdIndex]['brand']!.toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.teal,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                      Text(
+                        _shopLiveAds[_bottomAdIndex]['msg']!,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const Text(
+                  'Ad',
+                  style: TextStyle(color: Colors.grey, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _shopCard(String title, String price, String details, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 36, color: Colors.teal.shade700),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            details,
+            style: const TextStyle(color: Colors.grey, fontSize: 10),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            price,
+            style: TextStyle(
+              color: Colors.teal.shade700,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }
